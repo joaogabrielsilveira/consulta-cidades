@@ -62,6 +62,13 @@
 
         /* Gráficos */
         .grafico-container { background: var(--branco); padding: 20px; border-radius: 12px; box-shadow: var(--sombra); margin-bottom: 30px; }
+        
+        /* Lista de Fontes de Dados */
+        .lista-fontes { list-style: none; padding: 0; }
+        .lista-fontes li { padding: 15px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .lista-fontes li:last-child { border-bottom: none; padding-bottom: 0; }
+        .lista-fontes a { color: var(--verde-principal); text-decoration: none; font-weight: bold; background: var(--verde-claro); padding: 8px 15px; border-radius: 8px; transition: 0.3s; }
+        .lista-fontes a:hover { background: var(--verde-principal); color: var(--branco); }
     </style>
 </head>
 <body>
@@ -72,6 +79,7 @@
             <button class="ativo" onclick="mudarAba('visao-geral', this)">Visão Geral</button>
             <button onclick="mudarAba('busca-cidade', this)">Consultar Cidade</button>
             <button onclick="mudarAba('comparativos', this)">Gráficos Comparativos</button>
+            <button onclick="mudarAba('fontes-dados', this)">Fontes de Dados</button> 
         </nav>
     </header>
 
@@ -105,7 +113,7 @@
                             <th>Cidade</th>
                             <th>Temp (°C)</th>
                             <th>Sensação (°C)</th>
-							<th>Nuvens</th>
+                            <th>Nuvens</th>
                             <th>Umidade</th>
                             <th>Classificação</th>
                             <th>Pontuação (0-100)</th>
@@ -182,6 +190,31 @@
                 </div>
             </div>
         </section>
+
+        <section id="fontes-dados" class="secao">
+            <h2 style="margin-bottom: 20px; color: var(--texto-escuro);">Fontes de Dados Utilizadas</h2>
+            
+            <div class="card">
+                <ul class="lista-fontes">
+                    <li>
+                        <span><strong>1. OpenWeatherMap API</strong> - Dados climáticos em tempo real e previsões meteorológicas.</span>
+                        <a href="https://openweathermap.org/api" target="_blank">Acessar Fonte</a>
+                    </li>
+                    <li>
+                        <span><strong>2. OpenStreetMap (Overpass API)</strong> - Mapeamento colaborativo e pontos de interesse (POI).</span>
+                        <a href="https://wiki.openstreetmap.org/wiki/Overpass_API" target="_blank">Acessar Fonte</a>
+                    </li>
+                    <li>
+                        <span><strong>3. Portal de Dados Abertos (PRF)</strong> - Estatísticas base sobre trânsito e segurança.</span>
+                        <a href="https://dados.gov.br/dados/conjuntos-dados/sinistros-de-transito-agrupados-por-ocorrencia" target="_blank">Acessar Fonte</a>
+                    </li>
+                    <li>
+                        <span><strong>4. IBGE / Atlas da Violência</strong> - Dados demográficos e taxas históricas de criminalidade.</span>
+                        <a href="https://www.ipea.gov.br/atlasviolencia/" target="_blank">Acessar Fonte</a>
+                    </li>
+                </ul>
+            </div>
+        </section>
     </main>
 
     <script>
@@ -204,54 +237,54 @@
 
         // Função para carregar a Tabela Principal (Aba 1)
         async function carregarVisaoGeral() {
-			try {
-				// Mostra um aviso de carregamento enquanto espera
-				const tbody = document.getElementById('tabela-cidades-body');
-				tbody.innerHTML = '<tr><td colspan="6">Carregando dados ao vivo da planilha...</td></tr>';
+            try {
+                // Mostra um aviso de carregamento enquanto espera
+                const tbody = document.getElementById('tabela-cidades-body');
+                tbody.innerHTML = '<tr><td colspan="6">Carregando dados ao vivo da planilha...</td></tr>';
 
-				// Faz a requisição real para a sua URL, usando o parâmetro de roteamento ?acao=cidades
-				const response = await fetch(`${URL_BACKEND}?acao=cidades`);
-				const dados = await response.json();
+                // Faz a requisição real para a sua URL, usando o parâmetro de roteamento ?acao=cidades
+                const response = await fetch(`${URL_BACKEND}?acao=cidades`);
+                const dados = await response.json();
                 console.log(dados)
 
                 const dados_clima = dados.weather_data;
-				
-				// Limpa o aviso de "Carregando"
-				tbody.innerHTML = '';
+                
+                // Limpa o aviso de "Carregando"
+                tbody.innerHTML = '';
 
                 let seletor = document.getElementById('seletor-cidade');
                 seletor.innerHTML = '<option value="">Selecione uma cidade...</option>';
 
-				
-				// Monta a tabela iterando sobre as linhas vindas da planilha
-				// ATENÇÃO: Troque os nomes dentro dos colchetes pelos nomes EXATOS das suas colunas na planilha
-				dados_clima.forEach(d => {
-					tbody.innerHTML += `
-						<tr>
-							<td><strong>${d['Cidade'] || 'N/A'}</strong></td>
-							<td>${d['Temperatura (ºC)'].toFixed(1) || 'N/A'}°C</td>
-							<td>${d['Sensação térmica (ºC)'].toFixed(1) || 'N/A'}°C</td>
-							<td>${d['Nuvens'][0].toUpperCase() + d['Nuvens'].slice(1) || 'Não especificado'}</td>
-							<td>${d['Umidade (%)'] || 'N/A'}%</td>
-							<td><span class="tag">${d['Classificação de umidade'] || 'N/A'}</span></td>
-							<td>⭐ ${d['Pontuação (20-100)'] || 'N/A'}</td>
-						</tr>
-					`
+                
+                // Monta a tabela iterando sobre as linhas vindas da planilha
+                // ATENÇÃO: Troque os nomes dentro dos colchetes pelos nomes EXATOS das suas colunas na planilha
+                dados_clima.forEach(d => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${d['Cidade'] || 'N/A'}</strong></td>
+                            <td>${d['Temperatura (ºC)'].toFixed(1) || 'N/A'}°C</td>
+                            <td>${d['Sensação térmica (ºC)'].toFixed(1) || 'N/A'}°C</td>
+                            <td>${d['Nuvens'][0].toUpperCase() + d['Nuvens'].slice(1) || 'Não especificado'}</td>
+                            <td>${d['Umidade (%)'] || 'N/A'}%</td>
+                            <td><span class="tag">${d['Classificação de umidade'] || 'N/A'}</span></td>
+                            <td>⭐ ${d['Pontuação (20-100)'] || 'N/A'}</td>
+                        </tr>
+                    `
                     seletor.innerHTML += `<option value="${d['Cidade']}">${d['Cidade']}</option>`;
                     ;
-				});
+                });
 
-				// Atualiza a data de sincronização no painel superior
-				document.getElementById('data-atualizacao').innerText = new Date(dados.updateDate).toLocaleString('pt-BR');
+                // Atualiza a data de sincronização no painel superior
+                document.getElementById('data-atualizacao').innerText = new Date(dados.updateDate).toLocaleString('pt-BR');
                 // Preenchendo os destaques
                 document.getElementById('destaque-quente').innerText = dados.hottest;
                 document.getElementById('destaque-fria').innerText = dados.coldest;
-				
-			} catch (erro) {
-				console.error("Erro ao buscar dados do Google Sheets:", erro);
-				const tbody = document.getElementById('tabela-cidades-body');
-				tbody.innerHTML = '<tr><td colspan="6" style="color:red;">Erro ao carregar dados. Verifique o console ou a URL.</td></tr>';
-			}            
+                
+            } catch (erro) {
+                console.error("Erro ao buscar dados do Google Sheets:", erro);
+                const tbody = document.getElementById('tabela-cidades-body');
+                tbody.innerHTML = '<tr><td colspan="6" style="color:red;">Erro ao carregar dados. Verifique o console ou a URL.</td></tr>';
+            }            
         }
 
         // Função para consultar uma cidade específica (Aba 2)
@@ -362,7 +395,7 @@
                 console.log(categorias);
 
                 const response = await fetch(`${URL_BACKEND}?acao=consultar&cidade=${cidade}`);
-				const dadosPlanilha = await response.json();
+                const dadosPlanilha = await response.json();
 
                 console.log(dadosPlanilha);
                 
@@ -384,7 +417,7 @@
                             </tr>
                         `
                     }
-				});
+                });
 
                 let listaLocal = document.getElementById("lista-poi-detalhada");
                 listaLocal.innerHTML = "";
@@ -419,15 +452,15 @@
         async function atualizarAPIs() {
             try {
                 const tbody = document.getElementById('tabela-cidades-body');
-				tbody.innerHTML = '<tr><td colspan="6" style="color:green;">Atualizando dados com a API....</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="color:green;">Atualizando dados com a API....</td></tr>';
                 const response = await fetch(`${URL_BACKEND}?acao=atualizar`);
                 const dados = await response.json();
                 carregarVisaoGeral();
             } catch (erro) {
-				console.error("Erro ao buscar dados do Google Sheets:", erro);
-				const tbody = document.getElementById('tabela-cidades-body');
-				tbody.innerHTML = '<tr><td colspan="6" style="color:red;">Erro ao carregar dados. Verifique o console ou a URL.</td></tr>';
-			}
+                console.error("Erro ao buscar dados do Google Sheets:", erro);
+                const tbody = document.getElementById('tabela-cidades-body');
+                tbody.innerHTML = '<tr><td colspan="6" style="color:red;">Erro ao carregar dados. Verifique o console ou a URL.</td></tr>';
+            }
         }
 
         async function cadastrarCidade() {
